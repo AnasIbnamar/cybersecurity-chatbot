@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberGuard — Analytics</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body { overflow-y: auto; height: auto; }
+
+    .admin-wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 28px 24px 64px;
+    }
+
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 26px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .admin-brand svg { color: var(--accent); }
+    .admin-brand-name { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+    .admin-brand-sub  { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+
+    .admin-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all var(--transition);
+    }
+    .admin-back:hover { color: var(--text-primary); background: var(--bg-hover); }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 9px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-value.sm { font-size: 18px; padding-top: 4px; }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      color: var(--text-muted);
+      margin: 24px 0 10px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .data-table th {
+      text-align: left;
+      padding: 9px 16px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      background: var(--bg-sidebar);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-table td {
+      padding: 9px 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table td.strong { color: var(--text-primary); }
+    .data-table td.muted { color: var(--text-muted); font-size: 12px; }
+
+    .bar-wrap { width: 120px; }
+
+    .mini-bar {
+      height: 3px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .mini-bar-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.6s ease;
+    }
+
+    .tool-chip {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 3px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      letter-spacing: 0.2px;
+    }
+
+    .empty-row td {
+      text-align: center;
+      padding: 30px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 640px) {
+      .two-col { grid-template-columns: 1fr; }
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+      .bar-wrap { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<svg style="display:none" aria-hidden="true">
+  <defs>
+    <symbol id="a-shield" viewBox="0 0 32 32" fill="none">
+      <path d="M16 2.5L3.5 8v8c0 8.3 5.8 14.8 12.5 16.5C22.7 30.8 28.5 24.3 28.5 16V8L16 2.5z" fill="rgba(139,92,246,0.12)" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+      <rect x="10.5" y="14" width="11" height="9.5" rx="1.75" stroke="currentColor" stroke-width="1.4"/>
+      <path d="M13 14v-3a3 3 0 0 1 6 0v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      <circle cx="16" cy="18.75" r="1.75" fill="currentColor"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="admin-wrap">
+
+  <header class="admin-header">
+    <div class="admin-brand">
+      <svg style="width:26px;height:26px" viewBox="0 0 32 32" aria-hidden="true"><use href="#a-shield"></use></svg>
+      <div>
+        <div class="admin-brand-name">CyberGuard</div>
+        <div class="admin-brand-sub">Analytics Dashboard</div>
+      </div>
+    </div>
+    <a href="/dashboard" class="admin-back">&#8592; Dashboard</a>
+  </header>
+
+  <!-- Stat cards -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Scans</div>
+      <div class="stat-value">{{ stats.total_scans }}</div>
+      <div class="stat-sub">Tool analyses run</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Messages</div>
+      <div class="stat-value">{{ stats.total_messages }}</div>
+      <div class="stat-sub">{{ stats.user_messages }} user &nbsp;/&nbsp; {{ stats.ai_responses }} AI</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Top Tool</div>
+      <div class="stat-value sm">{{ stats.top_tool }}</div>
+      <div class="stat-sub">Most-used scanner</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Tools Active</div>
+      <div class="stat-value">{{ stats.tool_counts | length }}</div>
+      <div class="stat-sub">Distinct scanners used</div>
+    </div>
+  </div>
+
+  <!-- Tool breakdown + daily stats -->
+  <div class="two-col">
+
+    <div>
+      <div class="section-title">Tool Usage Breakdown</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Count</th>
+            <th>Share</th>
+            <th class="bar-wrap">Bar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if stats.tool_counts %}
+            {% for tool, count in stats.tool_counts.items() %}
+            <tr>
+              <td><span class="tool-chip">{{ tool | replace('_', ' ') }}</span></td>
+              <td class="strong">{{ count }}</td>
+              <td>{{ tool_pcts.get(tool, 0) }}%</td>
+              <td class="bar-wrap">
+                <div class="mini-bar">
+                  <div class="mini-bar-fill" style="width:{{ tool_pcts.get(tool, 0) }}%"></div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+          <tr class="empty-row"><td colspan="4">No tool usage recorded yet</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <div class="section-title">Daily Scans — Last 7 Days</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>Date</th><th>Scans</th></tr>
+        </thead>
+        <tbody>
+          {% if stats.daily_stats %}
+            {% for day in stats.daily_stats %}
+            <tr>
+              <td class="strong">{{ day.day }}</td>
+              <td>{{ day.count }}</td>
+            </tr>
+            {% endfor %}
+          {% else %}
+          <tr class="empty-row"><td colspan="2">No activity in the last 7 days</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Recent activity -->
+  <div class="section-title">Recent Activity</div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Tool</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if stats.recent_activity %}
+        {% for item in stats.recent_activity %}
+        <tr>
+          <td class="muted">{{ loop.index }}</td>
+          <td><span class="tool-chip">{{ item.tool | replace('_', ' ') }}</span></td>
+          <td>{{ item.at }}</td>
+        </tr>
+        {% endfor %}
+      {% else %}
+      <tr class="empty-row"><td colspan="3">No recent activity</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+
+</div>
+</body>
+</html>

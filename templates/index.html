@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CyberGuard — AI-powered cybersecurity assistant for real guidance, threat analysis, and security advice.">
+  <meta name="theme-color" content="#07111f">
+  <title>CyberGuard — AI Cybersecurity Assistant</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<!-- ══ SVG Sprite ══════════════════════════════════════════ -->
+<svg style="display:none" aria-hidden="true">
+  <defs>
+    <!-- CyberGuard shield+lock logo -->
+    <symbol id="icon-cyberguard" viewBox="0 0 32 32" fill="none">
+      <path d="M16 2.5L3.5 8v8c0 8.3 5.8 14.8 12.5 16.5C22.7 30.8 28.5 24.3 28.5 16V8L16 2.5z" fill="rgba(139,92,246,0.12)" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+      <rect x="10.5" y="14" width="11" height="9.5" rx="1.75" stroke="currentColor" stroke-width="1.4"/>
+      <path d="M13 14v-3a3 3 0 0 1 6 0v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      <circle cx="16" cy="18.75" r="1.75" fill="currentColor"/>
+    </symbol>
+    <!-- message-square -->
+    <symbol id="icon-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </symbol>
+    <!-- lock -->
+    <symbol id="icon-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </symbol>
+    <!-- mail -->
+    <symbol id="icon-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect width="20" height="16" x="2" y="4" rx="2"/>
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+    </symbol>
+    <!-- shield -->
+    <symbol id="icon-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </symbol>
+    <!-- alert-triangle -->
+    <symbol id="icon-alert-triangle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+      <path d="M12 9v4"/>
+      <path d="M12 17h.01"/>
+    </symbol>
+    <!-- user -->
+    <symbol id="icon-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </symbol>
+    <!-- wifi -->
+    <symbol id="icon-wifi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
+      <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+      <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+      <line x1="12" x2="12.01" y1="20" y2="20"/>
+    </symbol>
+    <!-- eye (privacy / visibility) -->
+    <symbol id="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </symbol>
+    <!-- eye-off -->
+    <symbol id="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
+      <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/>
+      <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/>
+      <line x1="2" x2="22" y1="2" y2="22"/>
+    </symbol>
+    <!-- activity (incident response) -->
+    <symbol id="icon-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+    </symbol>
+    <!-- smartphone -->
+    <symbol id="icon-smartphone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect width="14" height="20" x="5" y="2" rx="2" ry="2"/>
+      <path d="M12 18h.01"/>
+    </symbol>
+    <!-- refresh-cw -->
+    <symbol id="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+      <path d="M21 3v5h-5"/>
+      <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+      <path d="M8 16H3v5"/>
+    </symbol>
+    <!-- download -->
+    <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="7 10 12 15 17 10"/>
+      <line x1="12" x2="12" y1="15" y2="3"/>
+    </symbol>
+    <!-- search -->
+    <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/>
+      <path d="m21 21-4.35-4.35"/>
+    </symbol>
+    <!-- zap -->
+    <symbol id="icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+    </symbol>
+    <!-- info -->
+    <symbol id="icon-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M12 16v-4"/>
+      <path d="M12 8h.01"/>
+    </symbol>
+    <!-- flag -->
+    <symbol id="icon-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+      <line x1="4" x2="4" y1="22" y2="15"/>
+    </symbol>
+    <!-- key -->
+    <symbol id="icon-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="7.5" cy="15.5" r="5.5"/>
+      <path d="m21 2-9.6 9.6"/>
+      <path d="m15.5 7.5 3 3L22 7l-3-3"/>
+    </symbol>
+    <!-- alert-circle -->
+    <symbol id="icon-alert-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" x2="12" y1="8" y2="12"/>
+      <line x1="12" x2="12.01" y1="16" y2="16"/>
+    </symbol>
+    <!-- link -->
+    <symbol id="icon-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+    </symbol>
+    <!-- laptop -->
+    <symbol id="icon-laptop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect width="18" height="12" x="3" y="4" rx="2" ry="2"/>
+      <line x1="2" x2="22" y1="20" y2="20"/>
+    </symbol>
+    <!-- info-circle -->
+    <symbol id="icon-info-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M12 16v-4"/>
+      <path d="M12 8h.01"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="app-layout" id="appLayout">
+
+  <!-- ══════════════════ SIDEBAR ══════════════════ -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <svg class="brand-logo-svg" aria-hidden="true" viewBox="0 0 32 32"><use href="#icon-cyberguard"></use></svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">CyberGuard</span>
+        <span class="brand-sub">AI Security Assistant</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+      <div class="nav-group">
+        <span class="nav-label">ASSISTANT</span>
+        <button class="nav-btn active" data-view="chat" onclick="showView('chat')">
+          <svg class="nav-icon-svg" aria-hidden="true"><use href="#icon-chat"></use></svg>
+          <span>Ask CyberGuard</span>
+        </button>
+      </div>
+
+      <div class="nav-group">
+        <span class="nav-label">SECURITY TOOLS</span>
+        <button class="nav-btn" data-view="password" onclick="showView('password')">
+          <svg class="nav-icon-svg" aria-hidden="true"><use href="#icon-lock"></use></svg>
+          <span>Password Analyzer</span>
+        </button>
+        <button class="nav-btn" data-view="phishing" onclick="showView('phishing')">
+          <svg class="nav-icon-svg" aria-hidden="true"><use href="#icon-mail"></use></svg>
+          <span>Phishing Detector</span>
+        </button>
+        <button class="nav-btn" data-view="scam" onclick="showView('scam')">
+          <svg class="nav-icon-svg" aria-hidden="true"><use href="#icon-shield"></use></svg>
+          <span>Scam Detector</span>
+        </button>
+        <button class="nav-btn" data-view="url" onclick="showView('url')">
+          <svg class="nav-icon-svg" aria-hidden="true"><use href="#icon-link"></use></svg>
+          <span>URL Safety Checker</span>
+        </button>
+      </div>
+
+      <div class="nav-group">
+        <span class="nav-label">SECURITY GUIDES</span>
+        <button class="nav-btn" data-view="device" onclick="showView('device')">
+          <svg class="nav-icon-svg" aria-hidden="true"><use href="#icon-laptop"></use></svg>
+          <span>Device Security</span>
+        </button>
+        <button class="nav-btn" data-view="wifi" onclick="showView('wifi')">
+          <svg class="nav-icon-svg" aria-hidden="true"><use href="#icon-wifi"></use></svg>
+          <span>Wi-Fi Security</span>
+        </button>
+      </div>
+
+      <div class="nav-group">
+        <span class="nav-label">QUICK TOPICS</span>
+        <button class="nav-btn topic-btn" onclick="sendTopic('How do I secure my email account and enable 2FA?')">
+          <svg class="nav-icon-svg" aria-hidden="true"><use href="#icon-user"></use></svg>
+          <span>Account Security</span>
+        </button>
+        <button class="nav-btn topic-btn" onclick="sendTopic('How do I secure my home Wi-Fi network?')">
+          <svg class="nav-icon-svg" aria-hidden="true"><use href="#icon-wifi"></use></svg>
+          <span>Network Safety</span>
+        </button>
+        <button class="nav-btn topic-btn" onclick="sendTopic('How do I protect my privacy and personal data online?')">
+          <svg class="nav-icon-svg" aria-hidden="true"><use href="#icon-eye"></use></svg>
+          <span>Privacy &amp; Data</span>
+        </button>
+        <button class="nav-btn topic-btn" onclick="sendTopic('What should I do if my device is infected with malware?')">
+          <svg class="nav-icon-svg" aria-hidden="true"><use href="#icon-alert-triangle"></use></svg>
+          <span>Malware &amp; Threats</span>
+        </button>
+        <button class="nav-btn topic-btn" onclick="sendTopic('What steps should I take after a data breach or security incident?')">
+          <svg class="nav-icon-svg" aria-hidden="true"><use href="#icon-activity"></use></svg>
+          <span>Incident Response</span>
+        </button>
+        <button class="nav-btn topic-btn" onclick="sendTopic('What is mobile security and how do I secure my smartphone?')">
+          <svg class="nav-icon-svg" aria-hidden="true"><use href="#icon-smartphone"></use></svg>
+          <span>Mobile Security</span>
+        </button>
+      </div>
+
+    </nav>
+
+    <div class="sidebar-meta">
+      <span class="version-tag">v1.0.0</span>
+      <button class="meta-link" onclick="openAboutModal()">About &amp; Privacy</button>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="sidebar-action reset-btn" onclick="resetChat()">
+        <svg class="btn-icon-svg" aria-hidden="true"><use href="#icon-refresh"></use></svg>
+        Reset Chat
+      </button>
+      <button class="sidebar-action export-btn" onclick="exportChat()">
+        <svg class="btn-icon-svg" aria-hidden="true"><use href="#icon-download"></use></svg>
+        Export Chat
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- Mobile overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- ══════════════════ MAIN CONTENT ══════════════════ -->
+  <main class="main-content">
+
+    <!-- Mobile header -->
+    <div class="mobile-header">
+      <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="mobile-brand">
+        <svg class="brand-logo-svg-sm" aria-hidden="true" viewBox="0 0 32 32"><use href="#icon-cyberguard"></use></svg>
+        CyberGuard
+      </div>
+      <div class="status-dot-small"></div>
+    </div>
+
+    <!-- ── VIEW: Chat ── -->
+    <div id="view-chat" class="view active">
+      <div class="view-header">
+        <div class="view-title">
+          <div class="view-title-icon">
+            <svg class="view-icon-svg" aria-hidden="true"><use href="#icon-chat"></use></svg>
+          </div>
+          <div>
+            <h2>Ask CyberGuard</h2>
+            <p>Professional cybersecurity guidance, anytime</p>
+          </div>
+        </div>
+        <div class="online-badge">
+          <span class="pulse-dot"></span>
+          <span>Online</span>
+        </div>
+      </div>
+
+      <div id="chatBox" class="chat-box">
+        <div class="message bot-message">
+          <div class="message-avatar">
+            <svg class="avatar-svg" aria-hidden="true" viewBox="0 0 32 32"><use href="#icon-cyberguard"></use></svg>
+          </div>
+          <div class="message-body">
+            <div class="message-content">
+              <p>Welcome to <strong>CyberGuard</strong> — your AI-powered cybersecurity assistant.</p>
+              <p>I can help you with:</p>
+              <ul>
+                <li><strong>Password security</strong> — strength checks, account protection, 2FA setup</li>
+                <li><strong>Phishing &amp; scams</strong> — analysing suspicious emails and messages</li>
+                <li><strong>Malware &amp; threats</strong> — detection, removal guidance, and recovery</li>
+                <li><strong>Network safety</strong> — Wi-Fi security, VPNs, and firewall basics</li>
+                <li><strong>Privacy &amp; data protection</strong> — keeping your personal data safe</li>
+                <li><strong>Incident response</strong> — what to do after a breach or attack</li>
+              </ul>
+              <p>Use the <strong>Security Tools</strong> in the sidebar for instant analysis, or ask me anything below.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="typingIndicator" class="typing-indicator hidden">
+        <div class="message-avatar">
+          <svg class="avatar-svg" aria-hidden="true" viewBox="0 0 32 32"><use href="#icon-cyberguard"></use></svg>
+        </div>
+        <div class="typing-bubble">
+          <span></span><span></span><span></span>
+        </div>
+        <span class="typing-text">Analysing...</span>
+      </div>
+
+      <div class="suggestions-strip" id="suggestionsStrip"></div>
+
+      <div class="chat-input-area">
+        <div class="input-wrapper">
+          <input
+            type="text"
+            id="userInput"
+            placeholder="Ask a cybersecurity question..."
+            autocomplete="off"
+            maxlength="2000"
+            aria-label="Your message"
+          >
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()" aria-label="Send message">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+        <div class="input-hint">
+          Quick analysis: <code>password: YourPass</code> &nbsp;|&nbsp; <code>phish: email text</code> &nbsp;|&nbsp; <code>scam: message</code> &nbsp;|&nbsp; <code>url: link</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VIEW: Password Analyzer ── -->
+    <div id="view-password" class="view">
+      <div class="view-header">
+        <div class="view-title">
+          <div class="view-title-icon">
+            <svg class="view-icon-svg" aria-hidden="true"><use href="#icon-lock"></use></svg>
+          </div>
+          <div>
+            <h2>Password Security Analyzer</h2>
+            <p>Check strength and generate secure passwords</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tool-scroll">
+        <div class="tool-grid">
+
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">
+                <svg class="tool-icon-svg" aria-hidden="true"><use href="#icon-search"></use></svg>
+              </div>
+              <h3>Analyse Password Strength</h3>
+            </div>
+            <div class="field-group">
+              <div class="password-field">
+                <input type="password" id="pwInput" placeholder="Enter a password to analyse..." maxlength="128" autocomplete="off">
+                <button class="visibility-btn" id="visibilityBtn" onclick="togglePwVisibility()" title="Show/hide password" aria-label="Toggle password visibility">
+                  <svg class="btn-icon-svg" aria-hidden="true" id="visibilityIcon"><use href="#icon-eye"></use></svg>
+                </button>
+              </div>
+              <button class="tool-btn" onclick="analyzePassword()">Analyse Password</button>
+            </div>
+            <div id="pwResult" class="analysis-result hidden"></div>
+          </div>
+
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">
+                <svg class="tool-icon-svg" aria-hidden="true"><use href="#icon-zap"></use></svg>
+              </div>
+              <h3>Generate Strong Password</h3>
+            </div>
+            <div class="field-group">
+              <div class="range-group">
+                <label>Length: <strong id="pwLenLabel">16</strong> characters</label>
+                <input type="range" id="pwLengthSlider" min="12" max="48" value="16" oninput="document.getElementById('pwLenLabel').textContent = this.value">
+              </div>
+              <button class="tool-btn" onclick="generatePassword()">Generate Password</button>
+            </div>
+            <div id="pwGenResult" class="generated-result hidden">
+              <code id="pwGenOutput"></code>
+              <button class="copy-btn" onclick="copyGenPassword()">Copy</button>
+            </div>
+          </div>
+
+          <div class="tool-card info-card">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">
+                <svg class="tool-icon-svg" aria-hidden="true"><use href="#icon-info"></use></svg>
+              </div>
+              <h3>Password Security Best Practices</h3>
+            </div>
+            <ul class="best-practice-list">
+              <li><strong>Length over complexity</strong> — 16+ characters is more secure than a short complex password</li>
+              <li><strong>Unique passwords</strong> — never reuse passwords across accounts</li>
+              <li><strong>Password manager</strong> — use Bitwarden, 1Password, or Dashlane to manage credentials securely</li>
+              <li><strong>Enable 2FA everywhere</strong> — adds a critical second layer of protection</li>
+              <li><strong>Passphrases work</strong> — "correct-horse-battery-staple" is strong and memorable</li>
+              <li><strong>Check for breaches</strong> — visit <em>haveibeenpwned.com</em> to see if your email was compromised</li>
+              <li><strong>Never share passwords</strong> — not via email, SMS, or chat — ever</li>
+              <li><strong>Change after breaches</strong> — update passwords immediately if notified of a breach</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VIEW: Phishing Detector ── -->
+    <div id="view-phishing" class="view">
+      <div class="view-header">
+        <div class="view-title">
+          <div class="view-title-icon">
+            <svg class="view-icon-svg" aria-hidden="true"><use href="#icon-mail"></use></svg>
+          </div>
+          <div>
+            <h2>Phishing Email Analyser</h2>
+            <p>Detect phishing red flags in suspicious emails</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tool-scroll">
+        <div class="tool-grid">
+
+          <div class="tool-card wide-card">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">
+                <svg class="tool-icon-svg" aria-hidden="true"><use href="#icon-search"></use></svg>
+              </div>
+              <h3>Paste Suspicious Email Content</h3>
+            </div>
+            <textarea id="phishInput" placeholder="Paste the full email body or subject here — including any links, sender details, or text that looks suspicious..." rows="8" maxlength="3000"></textarea>
+            <button class="tool-btn" onclick="analyzePhishing()">Analyse for Phishing</button>
+            <div id="phishResult" class="analysis-result hidden"></div>
+          </div>
+
+          <div class="tool-card info-card">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">
+                <svg class="tool-icon-svg" aria-hidden="true"><use href="#icon-alert-triangle"></use></svg>
+              </div>
+              <h3>Common Phishing Red Flags</h3>
+            </div>
+            <ul class="best-practice-list">
+              <li><strong>Generic greeting</strong> — "Dear Customer" instead of your real name</li>
+              <li><strong>Urgency &amp; pressure</strong> — "Act now or your account will be closed in 24 hours"</li>
+              <li><strong>Sender spoofing</strong> — email domain doesn't match the real company</li>
+              <li><strong>Suspicious links</strong> — hover over links to see the real URL before clicking</li>
+              <li><strong>Credential requests</strong> — legitimate companies never ask for passwords via email</li>
+              <li><strong>Grammar &amp; spelling errors</strong> — professional companies proofread their communications</li>
+              <li><strong>Unexpected attachments</strong> — never open files you didn't expect to receive</li>
+              <li><strong>Too-good-to-be-true offers</strong> — prize wins, gift cards, and "security alerts" out of nowhere</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VIEW: Scam Detector ── -->
+    <div id="view-scam" class="view">
+      <div class="view-header">
+        <div class="view-title">
+          <div class="view-title-icon">
+            <svg class="view-icon-svg" aria-hidden="true"><use href="#icon-shield"></use></svg>
+          </div>
+          <div>
+            <h2>Scam Detection Analysis</h2>
+            <p>Identify scam patterns in suspicious messages</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tool-scroll">
+        <div class="tool-grid">
+
+          <div class="tool-card wide-card">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">
+                <svg class="tool-icon-svg" aria-hidden="true"><use href="#icon-search"></use></svg>
+              </div>
+              <h3>Paste Suspicious Message or Offer</h3>
+            </div>
+            <textarea id="scamInput" placeholder="Paste the suspicious SMS, email, social media message, job offer, or advertisement here..." rows="8" maxlength="3000"></textarea>
+            <button class="tool-btn" onclick="analyzeScam()">Detect Scam Patterns</button>
+            <div id="scamResult" class="analysis-result hidden"></div>
+          </div>
+
+          <div class="tool-card info-card">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">
+                <svg class="tool-icon-svg" aria-hidden="true"><use href="#icon-flag"></use></svg>
+              </div>
+              <h3>Common Scam Patterns</h3>
+            </div>
+            <ul class="best-practice-list">
+              <li><strong>Too good to be true</strong> — unexpected lottery wins, inheritances, or "free" gifts</li>
+              <li><strong>Gift card payment requests</strong> — no legitimate business asks you to pay with gift cards</li>
+              <li><strong>Wire transfer requests</strong> — nearly impossible to recover once sent</li>
+              <li><strong>Advance fee fraud</strong> — pay a small fee upfront to claim a much larger reward</li>
+              <li><strong>Impersonation</strong> — fake IRS, bank, Microsoft, or tech support calls/messages</li>
+              <li><strong>Fake investment returns</strong> — "guaranteed profits" and "risk-free" schemes</li>
+              <li><strong>Romance scams</strong> — online relationships that eventually ask for money</li>
+              <li><strong>Sensitive data requests</strong> — SSN, bank account, or credit card numbers</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VIEW: URL Safety Checker ── -->
+    <div id="view-url" class="view">
+      <div class="view-header">
+        <div class="view-title">
+          <div class="view-title-icon">
+            <svg class="view-icon-svg" aria-hidden="true"><use href="#icon-link"></use></svg>
+          </div>
+          <div>
+            <h2>URL Safety Checker</h2>
+            <p>Detect phishing indicators and suspicious URL patterns</p>
+          </div>
+        </div>
+      </div>
+      <div class="tool-scroll">
+        <div class="tool-grid">
+
+          <div class="tool-card wide-card">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">
+                <svg class="tool-icon-svg" aria-hidden="true"><use href="#icon-search"></use></svg>
+              </div>
+              <h3>Paste a URL to Analyse</h3>
+            </div>
+            <div class="field-group">
+              <input type="text" id="urlInput" placeholder="https://example.com/login" maxlength="2000" autocomplete="off" spellcheck="false" style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 14px;font-size:14px;color:var(--text-primary);outline:none;width:100%;transition:border-color var(--transition);" onfocus="this.style.borderColor='var(--border-focus)'" onblur="this.style.borderColor='var(--border)'">
+              <button class="tool-btn" onclick="analyzeUrl()">Check URL Safety</button>
+            </div>
+            <div id="urlResult" class="analysis-result hidden"></div>
+          </div>
+
+          <div class="tool-card info-card">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">
+                <svg class="tool-icon-svg" aria-hidden="true"><use href="#icon-alert-triangle"></use></svg>
+              </div>
+              <h3>Phishing URL Warning Signs</h3>
+            </div>
+            <ul class="best-practice-list">
+              <li><strong>Suspicious TLDs</strong> — .tk, .ml, .cf, .gq, .pw domains are frequently abused in phishing campaigns</li>
+              <li><strong>Brand impersonation</strong> — paypa1-secure.com or amazon-update.tk are not legitimate sites</li>
+              <li><strong>URL shorteners</strong> — bit.ly, tinyurl hide the real destination; expand before clicking</li>
+              <li><strong>IP-based domains</strong> — legitimate services use named domains, not raw IPs like 192.168.1.1</li>
+              <li><strong>@ symbol in URL</strong> — anything before @ is ignored by browsers; attackers use it to fake the host</li>
+              <li><strong>Excessive hyphens</strong> — secure-login-update-verify.com is a classic phishing domain pattern</li>
+              <li><strong>Suspicious path terms</strong> — /login, /verify, /update on unknown domains often harvest credentials</li>
+              <li><strong>Heavy URL encoding</strong> — many %-sequences often conceal malicious destinations</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VIEW: Device Security Checklist ── -->
+    <div id="view-device" class="view">
+      <div class="view-header">
+        <div class="view-title">
+          <div class="view-title-icon">
+            <svg class="view-icon-svg" aria-hidden="true"><use href="#icon-laptop"></use></svg>
+          </div>
+          <div>
+            <h2>Device Security Checklist</h2>
+            <p>Harden your devices against the most common threats</p>
+          </div>
+        </div>
+      </div>
+      <div class="tool-scroll">
+        <div class="guide-grid">
+
+          <div class="guide-section">
+            <div class="guide-section-title">
+              <svg style="width:14px;height:14px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Software &amp; Updates
+            </div>
+            <ul class="guide-checklist">
+              <li>Enable automatic OS updates — most attacks exploit known, patched vulnerabilities</li>
+              <li>Keep browsers, plugins, and apps updated; remove unused extensions</li>
+              <li>Install reputable antivirus software and schedule weekly scans</li>
+              <li>Enable the built-in firewall (Windows Defender Firewall / macOS Firewall)</li>
+              <li>Uninstall software you no longer use — every app is a potential attack surface</li>
+            </ul>
+          </div>
+
+          <div class="guide-section">
+            <div class="guide-section-title">
+              <svg style="width:14px;height:14px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Accounts &amp; Access
+            </div>
+            <ul class="guide-checklist">
+              <li>Use a password manager (Bitwarden, 1Password) — unique passwords for every account</li>
+              <li>Enable multi-factor authentication on all important accounts</li>
+              <li>Use a standard (non-admin) user account for day-to-day tasks</li>
+              <li>Lock your screen whenever you step away (Win+L / Ctrl+Cmd+Q)</li>
+              <li>Set auto-lock to 5 minutes or less when idle</li>
+            </ul>
+          </div>
+
+          <div class="guide-section">
+            <div class="guide-section-title">
+              <svg style="width:14px;height:14px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              Disk &amp; Data
+            </div>
+            <ul class="guide-checklist">
+              <li>Enable full-disk encryption (BitLocker on Windows, FileVault on macOS)</li>
+              <li>Follow the 3-2-1 backup rule: 3 copies, 2 media types, 1 offsite or cloud</li>
+              <li>Regularly test that backups can actually be restored</li>
+              <li>Securely wipe storage before selling or discarding old hardware</li>
+              <li>Encrypt USB drives that leave your home or office</li>
+            </ul>
+          </div>
+
+          <div class="guide-section">
+            <div class="guide-section-title">
+              <svg style="width:14px;height:14px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+              Mobile Devices
+            </div>
+            <ul class="guide-checklist">
+              <li>Use a strong PIN or biometric lock — not a 4-digit PIN or swipe pattern</li>
+              <li>Only install apps from official stores; check permissions before granting</li>
+              <li>Keep iOS/Android updated — use auto-update for apps too</li>
+              <li>Enable remote wipe so you can erase a stolen or lost device</li>
+              <li>Avoid charging from untrusted USB ports (juice jacking) — carry your own charger</li>
+            </ul>
+          </div>
+
+          <div class="guide-section">
+            <div class="guide-section-title">
+              <svg style="width:14px;height:14px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              Privacy &amp; Browsing
+            </div>
+            <ul class="guide-checklist">
+              <li>Use a privacy-respecting browser (Firefox, Brave) with uBlock Origin installed</li>
+              <li>Disable location, microphone, and camera permissions for sites that don't need them</li>
+              <li>Use a reputable VPN on public networks to encrypt your traffic</li>
+              <li>Regularly clear cookies and site data; use private/incognito mode for sensitive browsing</li>
+              <li>Check <em>haveibeenpwned.com</em> monthly to see if your email was in a breach</li>
+            </ul>
+          </div>
+
+          <div class="guide-section">
+            <div class="guide-section-title">
+              <svg style="width:14px;height:14px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+              Incident Preparedness
+            </div>
+            <ul class="guide-checklist">
+              <li>Know your ISP and device manufacturer's support contacts in advance</li>
+              <li>Keep a printed note of your password manager's emergency access / recovery kit</li>
+              <li>Know how to isolate an infected machine from the network (disable Wi-Fi / unplug)</li>
+              <li>Store a clean OS boot USB in case of ransomware or corrupt system files</li>
+              <li>Document your accounts and services so you can recover access in an emergency</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VIEW: Wi-Fi Security Guide ── -->
+    <div id="view-wifi" class="view">
+      <div class="view-header">
+        <div class="view-title">
+          <div class="view-title-icon">
+            <svg class="view-icon-svg" aria-hidden="true"><use href="#icon-wifi"></use></svg>
+          </div>
+          <div>
+            <h2>Wi-Fi Security Guide</h2>
+            <p>Secure your home and workplace networks</p>
+          </div>
+        </div>
+      </div>
+      <div class="tool-scroll">
+        <div class="guide-grid">
+
+          <div class="guide-section">
+            <div class="guide-section-title">
+              <svg style="width:14px;height:14px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Router Hardening
+            </div>
+            <ul class="guide-checklist">
+              <li>Change the default admin username and password on your router immediately</li>
+              <li>Update router firmware — manufacturers regularly patch security vulnerabilities</li>
+              <li>Disable remote management unless you specifically need it</li>
+              <li>Use WPA3 encryption if your router supports it; WPA2-AES is the minimum</li>
+              <li>Disable WPS (Wi-Fi Protected Setup) — it has known vulnerabilities</li>
+            </ul>
+          </div>
+
+          <div class="guide-section">
+            <div class="guide-section-title">
+              <svg style="width:14px;height:14px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Network Passwords
+            </div>
+            <ul class="guide-checklist">
+              <li>Use a strong, unique Wi-Fi password — at least 16 characters with mixed characters</li>
+              <li>Don't share your Wi-Fi password publicly or post it on social media</li>
+              <li>Create a separate guest network for visitors and IoT devices</li>
+              <li>Regularly rotate your Wi-Fi password, especially after a security incident</li>
+              <li>Never use your name, address, or birth year in your network name (SSID)</li>
+            </ul>
+          </div>
+
+          <div class="guide-section">
+            <div class="guide-section-title">
+              <svg style="width:14px;height:14px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" x2="12.01" y1="20" y2="20"/></svg>
+              Public Wi-Fi Safety
+            </div>
+            <ul class="guide-checklist">
+              <li>Assume all public Wi-Fi (cafes, airports, hotels) is untrusted and monitored</li>
+              <li>Use a reputable VPN whenever connecting to public networks</li>
+              <li>Never access banking, email, or sensitive accounts on public Wi-Fi without a VPN</li>
+              <li>Watch for evil twin attacks — fake hotspots named identically to legitimate ones</li>
+              <li>Disable auto-connect to open networks in your device's Wi-Fi settings</li>
+            </ul>
+          </div>
+
+          <div class="guide-section">
+            <div class="guide-section-title">
+              <svg style="width:14px;height:14px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+              IoT &amp; Smart Devices
+            </div>
+            <ul class="guide-checklist">
+              <li>Place smart TVs, cameras, and IoT devices on a separate guest VLAN</li>
+              <li>Change default passwords on every smart device — most ship with "admin/admin"</li>
+              <li>Disable features you don't use: Universal Plug and Play (UPnP) is a common risk</li>
+              <li>Check manufacturer websites for firmware updates for all smart home devices</li>
+              <li>Regularly audit devices connected to your network — remove anything unrecognised</li>
+            </ul>
+          </div>
+
+          <div class="guide-section">
+            <div class="guide-section-title">
+              <svg style="width:14px;height:14px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              Monitoring &amp; Detection
+            </div>
+            <ul class="guide-checklist">
+              <li>Log in to your router's admin panel monthly to review connected devices</li>
+              <li>Set up router alerts for new device connections if your router supports it</li>
+              <li>Enable DNS-over-HTTPS (DoH) on your router or devices to prevent DNS snooping</li>
+              <li>Consider using Pi-hole or AdGuard Home for network-wide ad and tracker blocking</li>
+              <li>Review your ISP's router security features — many offer basic threat monitoring</li>
+            </ul>
+          </div>
+
+          <div class="guide-section">
+            <div class="guide-section-title">
+              <svg style="width:14px;height:14px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+              VPN Guidance
+            </div>
+            <ul class="guide-checklist">
+              <li>Choose a VPN with a verified no-logs policy and independent audit (Mullvad, ProtonVPN)</li>
+              <li>Avoid free VPNs — your traffic data is often the product being sold</li>
+              <li>Use WireGuard or OpenVPN protocol for the best security-to-speed balance</li>
+              <li>Enable the VPN kill switch to block traffic if the VPN connection drops</li>
+              <li>A VPN protects your connection, not your accounts — still use strong passwords and 2FA</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── About / Privacy Modal ───────────────────────────── -->
+<div id="aboutModal" class="modal-overlay hidden" onclick="closeAboutModal(event)">
+  <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">About CyberGuard</span>
+      <button class="modal-close" onclick="closeAboutModal()" aria-label="Close dialog">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <p><strong>CyberGuard v1.0.0</strong> — AI-powered cybersecurity assistant for defensive security awareness and education.</p>
+
+      <div>
+        <h4>Disclaimer</h4>
+        <p>CyberGuard is an educational guidance tool. It does not provide hacking instructions, assist with unauthorised access, or replace professional incident response. For active security incidents, contact a qualified cybersecurity professional or your organisation's security team.</p>
+      </div>
+
+      <div>
+        <h4>Privacy</h4>
+        <p>Content you paste for analysis (passwords, emails, URLs, messages) is processed in memory and never stored. Only anonymous tool usage counts are logged to help improve the product. No personal data is collected or shared.</p>
+      </div>
+
+      <div>
+        <h4>How It Works</h4>
+        <p>Security scanners use heuristic pattern matching running entirely on the server — your content does not reach third-party scan APIs. The AI assistant uses the Groq or OpenAI API to generate responses.</p>
+      </div>
+
+      <div>
+        <h4>Technical Stack</h4>
+        <ul>
+          <li>Backend: Python 3.10+, Flask 3.x</li>
+          <li>AI Provider: Groq (llama-3.3-70b-versatile) or OpenAI (gpt-4o-mini)</li>
+          <li>Database: SQLite (anonymous usage counts only)</li>
+          <li>Analysis: Heuristic-only, no external scan APIs</li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>License</h4>
+        <p>MIT License. Open source and free to use, modify, and distribute.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  CYBERGUARD — Professional Cybersecurity Assistant
+// ═══════════════════════════════════════════════════════════
+
+// ── Helpers ───────────────────────────────────────────────
+function escText(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+const BOT_AVATAR = `<div class="message-avatar"><svg class="avatar-svg" aria-hidden="true" viewBox="0 0 32 32"><use href="#icon-cyberguard"></use></svg></div>`;
+
+// ── View management ──────────────────────────────────────
+function showView(viewId) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+  const view = document.getElementById('view-' + viewId);
+  if (view) view.classList.add('active');
+
+  document.querySelectorAll(`[data-view="${viewId}"]`).forEach(b => b.classList.add('active'));
+
+  closeSidebar();
+
+  if (viewId === 'chat') {
+    setTimeout(() => {
+      const input = document.getElementById('userInput');
+      if (input) input.focus();
+    }, 100);
+  }
+}
+
+// ── Sidebar (mobile) ──────────────────────────────────────
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('visible');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('visible');
+}
+
+// ── Markdown renderer ─────────────────────────────────────
+function renderMarkdown(text) {
+  if (!text) return '';
+
+  const lines = text.split('\n');
+  let html = '';
+  let inUl = false;
+
+  function closeList() {
+    if (inUl) { html += '</ul>'; inUl = false; }
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function inlineFormat(s) {
+    return escHtml(s)
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/→ /g, '<span class="arrow">→</span> ');
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i];
+    const trimmed = raw.trim();
+
+    if (trimmed === '') {
+      closeList();
+      continue;
+    }
+
+    if (trimmed.startsWith('## ') || trimmed.startsWith('### ')) {
+      closeList();
+      const lvl = trimmed.startsWith('## ') ? 3 : 4;
+      html += `<h${lvl}>${inlineFormat(trimmed.replace(/^#{2,4}\s+/, ''))}</h${lvl}>`;
+      continue;
+    }
+
+    if (trimmed.startsWith('**') && trimmed.endsWith('**') && trimmed.length > 4) {
+      closeList();
+      html += `<p class="bold-line">${inlineFormat(trimmed)}</p>`;
+      continue;
+    }
+
+    const listMatch = trimmed.match(/^([-•*]|\d+\.|→)\s+(.*)/);
+    if (listMatch) {
+      if (!inUl) { html += '<ul>'; inUl = true; }
+      html += `<li>${inlineFormat(listMatch[2])}</li>`;
+      continue;
+    }
+
+    closeList();
+    html += `<p>${inlineFormat(trimmed)}</p>`;
+  }
+
+  closeList();
+  return html;
+}
+
+// ── Chat: add message ─────────────────────────────────────
+function addMessage(content, sender) {
+  const chatBox = document.getElementById('chatBox');
+  if (!chatBox) return;
+
+  const msg = document.createElement('div');
+  msg.className = 'message ' + (sender === 'user' ? 'user-message' : 'bot-message');
+
+  if (sender === 'bot') {
+    msg.innerHTML = BOT_AVATAR;
+
+    const body = document.createElement('div');
+    body.className = 'message-body';
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    contentDiv.innerHTML = renderMarkdown(content);
+
+    const actions = document.createElement('div');
+    actions.className = 'message-actions';
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'msg-copy-btn';
+    copyBtn.textContent = 'Copy';
+    copyBtn.onclick = () => copyMessageText(content, copyBtn);
+    actions.appendChild(copyBtn);
+
+    body.appendChild(contentDiv);
+    body.appendChild(actions);
+    msg.appendChild(body);
+  } else {
+    const body = document.createElement('div');
+    body.className = 'message-body';
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    contentDiv.textContent = content;
+    body.appendChild(contentDiv);
+    msg.appendChild(body);
+  }
+
+  chatBox.appendChild(msg);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// ── Service notice (quota / auth / connection errors) ─────
+function addServiceNotice(message, type) {
+  const chatBox = document.getElementById('chatBox');
+  if (!chatBox) return;
+
+  const existing = chatBox.querySelector('.service-notice');
+  if (existing) existing.remove();
+
+  const notice = document.createElement('div');
+  notice.className = 'service-notice' + (type === 'warn' ? ' notice-warn' : ' notice-quota');
+
+  const isQuota = !type || type === 'quota';
+  const iconId = isQuota ? 'icon-key' : 'icon-alert-circle';
+
+  notice.innerHTML = `
+    <svg class="notice-icon-svg" aria-hidden="true"><use href="#${iconId}"></use></svg>
+    <div class="notice-body">
+      <strong>${isQuota ? 'AI Assistant Unavailable' : 'Service Notice'}</strong>
+      <p>${escText(message)}</p>
+      ${isQuota ? `<div class="notice-actions">
+        <span class="notice-tip">The <strong>Password Analyzer</strong>, <strong>Phishing Detector</strong>, and <strong>Scam Detector</strong> work without the AI — use the sidebar tools.</span>
+      </div>` : ''}
+    </div>
+  `;
+
+  chatBox.appendChild(notice);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function copyMessageText(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+  }).catch(() => {
+    btn.textContent = 'Failed';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+  });
+}
+
+// ── Suggested questions ───────────────────────────────────
+const SUGGESTED_QUESTIONS = [
+  'How do I enable 2FA on my Google account?',
+  'How do I make my Wi-Fi network more secure?',
+  'What should I do if I clicked a phishing link?',
+  'How do I recover from a malware infection?',
+  'What is a VPN and do I need one?',
+  'How do I know if my password was leaked?',
+  'What is social engineering and how do I avoid it?',
+  'How do I secure my smartphone?',
+];
+
+function renderSuggestions() {
+  const strip = document.getElementById('suggestionsStrip');
+  if (!strip) return;
+  strip.innerHTML = '';
+  const shuffled = [...SUGGESTED_QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 4);
+  shuffled.forEach(q => {
+    const btn = document.createElement('button');
+    btn.className = 'suggestion-chip';
+    btn.textContent = q;
+    btn.onclick = () => {
+      document.getElementById('userInput').value = q;
+      sendMessage();
+    };
+    strip.appendChild(btn);
+  });
+}
+
+// ── Send message ──────────────────────────────────────────
+function sendMessage() {
+  const input = document.getElementById('userInput');
+  const sendBtn = document.getElementById('sendBtn');
+  if (!input) return;
+
+  const message = input.value.trim();
+  if (!message) return;
+
+  addMessage(message, 'user');
+  input.value = '';
+  input.disabled = true;
+  if (sendBtn) sendBtn.disabled = true;
+
+  const typing = document.getElementById('typingIndicator');
+  if (typing) typing.classList.remove('hidden');
+
+  const strip = document.getElementById('suggestionsStrip');
+  if (strip) strip.innerHTML = '';
+
+  fetch('/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message }),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (typing) typing.classList.add('hidden');
+    input.disabled = false;
+    if (sendBtn) sendBtn.disabled = false;
+    input.focus();
+
+    if (data.reply) {
+      addMessage(data.reply, 'bot');
+    } else if (data.error === 'ai_quota') {
+      addServiceNotice(data.message);
+    } else if (data.error === 'ai_auth') {
+      addServiceNotice(data.message, 'warn');
+    } else if (data.error === 'ai_connection') {
+      addServiceNotice(data.message, 'warn');
+    } else {
+      addMessage(data.message || data.error || 'Unknown error occurred.', 'bot');
+    }
+    renderSuggestions();
+  })
+  .catch(() => {
+    if (typing) typing.classList.add('hidden');
+    input.disabled = false;
+    if (sendBtn) sendBtn.disabled = false;
+    addServiceNotice('Connection error. Please check your network and try again.', 'warn');
+    renderSuggestions();
+  });
+}
+
+// ── Topic shortcut ─────────────────────────────────────────
+function sendTopic(topic) {
+  showView('chat');
+  setTimeout(() => {
+    const input = document.getElementById('userInput');
+    if (input) {
+      input.value = topic;
+      sendMessage();
+    }
+  }, 150);
+}
+
+// ── Reset chat ─────────────────────────────────────────────
+async function resetChat() {
+  if (!confirm('Reset the conversation? This will clear all messages.')) return;
+  try {
+    await fetch('/reset', { method: 'POST' });
+  } catch (_) {}
+  const chatBox = document.getElementById('chatBox');
+  if (chatBox) {
+    chatBox.innerHTML = `
+      <div class="message bot-message">
+        ${BOT_AVATAR}
+        <div class="message-body">
+          <div class="message-content"><p>Conversation reset. How can I help you with your cybersecurity today?</p></div>
+        </div>
+      </div>
+    `;
+  }
+  renderSuggestions();
+}
+
+// ── Export chat ────────────────────────────────────────────
+function exportChat() {
+  const messages = document.querySelectorAll('#chatBox .message');
+  if (!messages.length) { alert('Nothing to export.'); return; }
+
+  let report = 'CYBERGUARD SECURITY SESSION REPORT\n';
+  report += '='.repeat(50) + '\n';
+  report += 'Generated: ' + new Date().toLocaleString() + '\n';
+  report += 'Platform: CyberGuard AI Cybersecurity Assistant\n';
+  report += '='.repeat(50) + '\n\n';
+
+  messages.forEach(msg => {
+    const isUser = msg.classList.contains('user-message');
+    const sender = isUser ? 'YOU' : 'CYBERGUARD';
+    const body = msg.querySelector('.message-content');
+    const text = body ? body.innerText.trim() : '';
+    if (text) {
+      report += `[${sender}]\n${text}\n\n`;
+    }
+  });
+
+  report += '='.repeat(50) + '\n';
+  report += 'End of report — CyberGuard Security Session\n';
+
+  const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'cyberguard-session-' + Date.now() + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TOOL PANEL: Result Renderers
+// ═══════════════════════════════════════════════════════════
+
+function renderPasswordResult(data, container) {
+  const pct = (data.level / 5) * 100;
+
+  const feedbackHtml = data.feedback.map(f =>
+    `<div class="fb-item fb-${f.status}">${escText(f.text)}</div>`
+  ).join('');
+
+  const suggestHtml = data.suggestions && data.suggestions.length
+    ? `<div class="result-section"><div class="result-section-title">Recommendations</div>${data.suggestions.map(s => `<div class="fb-item">→ ${escText(s)}</div>`).join('')}</div>`
+    : '';
+
+  container.innerHTML = `
+    <div class="result-panel risk-${strengthToRisk(data.level)}">
+      <div class="result-header">
+        <div class="verdict-badge">${escText(data.strength)}</div>
+        <div class="verdict-score">${data.score}/${data.max_score}</div>
+      </div>
+      <div class="meter-track"><div class="meter-fill" style="width:${pct}%;background:${escText(data.color)}"></div></div>
+      <div class="result-section"><div class="result-section-title">Analysis</div>${feedbackHtml}</div>
+      ${suggestHtml}
+      <div class="recommendation-box">
+        <strong>Tip:</strong> Use a reputable password manager (Bitwarden, 1Password) to generate and store unique passwords for every account.
+      </div>
+    </div>
+  `;
+  container.classList.remove('hidden');
+}
+
+function strengthToRisk(level) {
+  if (level >= 4) return 'safe';
+  if (level === 3) return 'low';
+  if (level === 2) return 'medium';
+  return 'high';
+}
+
+function renderRiskResult(data, container) {
+  const score = data.risk_score !== undefined ? data.risk_score : data.scam_score;
+  const pct = (score / 10) * 100;
+  const riskColor = { high: '#ef4444', medium: '#f97316', low: '#eab308', safe: '#22c55e' };
+  const color = riskColor[data.risk_level] || '#fb923c';
+
+  const sevLabel = { critical: 'CRIT', high: 'HIGH', medium: 'MED', low: 'LOW' };
+  const sevClass = { critical: 'sev-critical', high: 'sev-high', medium: 'sev-medium', low: 'sev-low' };
+
+  const indicatorsHtml = (data.indicators || []).map(ind =>
+    `<div class="fb-item"><span class="sev-badge ${sevClass[ind.severity] || 'sev-medium'}">${sevLabel[ind.severity] || 'INFO'}</span>${escText(ind.text)}</div>`
+  ).join('');
+
+  container.innerHTML = `
+    <div class="result-panel risk-${data.risk_level}">
+      <div class="result-header">
+        <div class="verdict-badge">${escText(data.verdict)}</div>
+        <div class="verdict-score">Risk: ${score}/10</div>
+      </div>
+      <div class="meter-track"><div class="meter-fill" style="width:${pct}%;background:${color}"></div></div>
+      ${indicatorsHtml
+        ? `<div class="result-section"><div class="result-section-title">Detected Indicators</div>${indicatorsHtml}</div>`
+        : `<div class="result-section"><div class="result-section-title">Detected Indicators</div><div class="fb-item fb-good">No indicators detected</div></div>`
+      }
+      <div class="recommendation-box"><strong>Recommendation:</strong> ${escText(data.recommendation)}</div>
+    </div>
+  `;
+  container.classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TOOL ACTIONS
+// ═══════════════════════════════════════════════════════════
+
+function analyzePassword() {
+  const input = document.getElementById('pwInput');
+  const result = document.getElementById('pwResult');
+  const pw = input ? input.value : '';
+  if (!pw) { alert('Please enter a password to analyse.'); return; }
+
+  fetch('/api/password-check', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: pw }),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.error) { alert(data.error); return; }
+    renderPasswordResult(data, result);
+  })
+  .catch(() => alert('Analysis failed. Please try again.'));
+}
+
+function togglePwVisibility() {
+  const input = document.getElementById('pwInput');
+  const iconEl = document.getElementById('visibilityIcon');
+  if (!input) return;
+  const isPassword = input.type === 'password';
+  input.type = isPassword ? 'text' : 'password';
+  if (iconEl) {
+    iconEl.querySelector('use').setAttribute('href', isPassword ? '#icon-eye-off' : '#icon-eye');
+  }
+}
+
+function generatePassword() {
+  const slider = document.getElementById('pwLengthSlider');
+  const length = slider ? parseInt(slider.value) : 16;
+  const resultDiv = document.getElementById('pwGenResult');
+  const output = document.getElementById('pwGenOutput');
+
+  fetch('/api/generate-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ length }),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.password && output && resultDiv) {
+      output.textContent = data.password;
+      resultDiv.classList.remove('hidden');
+    }
+  })
+  .catch(() => alert('Failed to generate password.'));
+}
+
+function copyGenPassword() {
+  const output = document.getElementById('pwGenOutput');
+  if (!output) return;
+  navigator.clipboard.writeText(output.textContent).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    if (btn) {
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+    }
+  });
+}
+
+function analyzePhishing() {
+  const input = document.getElementById('phishInput');
+  const result = document.getElementById('phishResult');
+  const text = input ? input.value.trim() : '';
+  if (!text) { alert('Please paste the email content first.'); return; }
+
+  fetch('/api/phishing-check', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.error) { alert(data.error); return; }
+    renderRiskResult(data, result);
+  })
+  .catch(() => alert('Analysis failed. Please try again.'));
+}
+
+function analyzeScam() {
+  const input = document.getElementById('scamInput');
+  const result = document.getElementById('scamResult');
+  const text = input ? input.value.trim() : '';
+  if (!text) { alert('Please paste the message content first.'); return; }
+
+  fetch('/api/scam-check', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.error) { alert(data.error); return; }
+    renderRiskResult(data, result);
+  })
+  .catch(() => alert('Analysis failed. Please try again.'));
+}
+
+function analyzeUrl() {
+  const input = document.getElementById('urlInput');
+  const result = document.getElementById('urlResult');
+  const url = input ? input.value.trim() : '';
+  if (!url) { alert('Please enter a URL to analyse.'); return; }
+
+  fetch('/api/url-check', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url }),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.error) { alert(data.error); return; }
+    renderRiskResult(data, result);
+  })
+  .catch(() => alert('Analysis failed. Please try again.'));
+}
+
+// ── About modal ───────────────────────────────────────────
+function openAboutModal() {
+  const modal = document.getElementById('aboutModal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeAboutModal(event) {
+  if (event && event.target !== document.getElementById('aboutModal')) return;
+  const modal = document.getElementById('aboutModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('userInput');
+  if (input) {
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+  }
+
+  ['phishInput', 'scamInput'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && e.ctrlKey) {
+          e.preventDefault();
+          if (id === 'phishInput') analyzePhishing();
+          if (id === 'scamInput') analyzeScam();
+        }
+      });
+    }
+  });
+
+  const pwInput = document.getElementById('pwInput');
+  if (pwInput) {
+    pwInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); analyzePassword(); }
+    });
+  }
+
+  const urlInput = document.getElementById('urlInput');
+  if (urlInput) {
+    urlInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); analyzeUrl(); }
+    });
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('aboutModal');
+      if (modal && !modal.classList.contains('hidden')) modal.classList.add('hidden');
+    }
+  });
+
+  renderSuggestions();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CyberGuard — AI-powered cybersecurity assistant. Analyse passwords, detect phishing, identify scams, and check URLs for threats.">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>CyberGuard — AI Cybersecurity Assistant</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <style>
+    :root {
+      --bg:          #0a0a0a;
+      --bg-card:     #141414;
+      --accent:      #8b5cf6;
+      --accent-dim:  rgba(139, 92, 246, 0.10);
+      --accent-ring: rgba(139, 92, 246, 0.20);
+      --text:        #f5f5f5;
+      --text-2:      #888;
+      --text-3:      #444;
+      --border:      rgba(255, 255, 255, 0.07);
+      --green:       #22c55e;
+      --radius:      10px;
+      --transition:  0.15s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Header ─────────────────────────────────────────── */
+    .lp-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 10, 10, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 13px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .lp-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15.5px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .lp-brand svg { color: var(--accent); flex-shrink: 0; }
+
+    .lp-nav {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      font-size: 14px;
+      color: var(--text-2);
+    }
+
+    .lp-nav a { transition: color var(--transition); }
+    .lp-nav a:hover { color: var(--text); }
+
+    .btn-header {
+      background: var(--accent);
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-size: 13.5px;
+      font-weight: 600;
+      transition: opacity var(--transition);
+    }
+    .btn-header:hover { opacity: 0.85; color: #fff; }
+
+    /* ── Container ──────────────────────────────────────── */
+    .lp-wrap { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── Hero ───────────────────────────────────────────── */
+    .lp-hero {
+      text-align: center;
+      padding: 88px 24px 68px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-ring);
+      color: var(--accent);
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      margin-bottom: 26px;
+    }
+
+    .hero-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: dot-pulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes dot-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .hero-h1 {
+      font-size: clamp(34px, 5.5vw, 54px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 18px;
+    }
+
+    .hero-h1 em { color: var(--accent); font-style: normal; }
+
+    .hero-sub {
+      font-size: clamp(15px, 2vw, 17.5px);
+      color: var(--text-2);
+      max-width: 540px;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+    }
+
+    .hero-btns {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      padding: 13px 28px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      transition: opacity var(--transition);
+    }
+    .btn-primary:hover { opacity: 0.85; color: #fff; }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-2);
+      padding: 13px 28px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      transition: all var(--transition);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+    .hero-trust {
+      margin-top: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      flex-wrap: wrap;
+    }
+
+    .trust-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--text-3);
+    }
+
+    .trust-check {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: rgba(34, 197, 94, 0.10);
+      border: 1px solid rgba(34, 197, 94, 0.18);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--green);
+      font-size: 9px;
+      flex-shrink: 0;
+    }
+
+    /* ── Sections ────────────────────────────────────────── */
+    .lp-section { padding: 68px 0; border-top: 1px solid var(--border); }
+
+    .eyebrow {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--accent);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .section-h2 {
+      font-size: clamp(22px, 3.5vw, 32px);
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+    }
+
+    .section-sub {
+      text-align: center;
+      color: var(--text-2);
+      font-size: 15px;
+      max-width: 480px;
+      margin: 0 auto 46px;
+      line-height: 1.65;
+    }
+
+    /* ── Features grid ───────────────────────────────────── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 12px;
+    }
+
+    .feat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 22px;
+      transition: border-color var(--transition);
+    }
+    .feat-card:hover { border-color: rgba(139, 92, 246, 0.25); }
+
+    .feat-icon {
+      width: 32px; height: 32px;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-ring);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent);
+      margin-bottom: 13px;
+    }
+
+    .feat-h3 { font-size: 14.5px; font-weight: 600; margin-bottom: 7px; }
+    .feat-p  { font-size: 13.5px; color: var(--text-2); line-height: 1.6; }
+
+    /* ── Steps ───────────────────────────────────────────── */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .step-card {
+      text-align: center;
+      padding: 28px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .step-num {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-ring);
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 13px;
+    }
+
+    .step-h3 { font-size: 14.5px; font-weight: 600; margin-bottom: 7px; }
+    .step-p  { font-size: 13.5px; color: var(--text-2); line-height: 1.6; }
+
+    /* ── Principles ──────────────────────────────────────── */
+    .principles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 10px;
+    }
+
+    .principle {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+
+    .principle-icon {
+      width: 26px; height: 26px;
+      flex-shrink: 0;
+      background: var(--accent-dim);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent);
+      margin-top: 1px;
+    }
+
+    .principle-h4 { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+    .principle-p  { font-size: 12.5px; color: var(--text-2); line-height: 1.55; }
+
+    /* ── FAQ ─────────────────────────────────────────────── */
+    .faq-list { max-width: 660px; margin: 0 auto; }
+
+    details {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 7px;
+      background: var(--bg-card);
+      overflow: hidden;
+    }
+
+    summary {
+      padding: 15px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      transition: color var(--transition);
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; font-size: 17px; color: var(--text-3); flex-shrink: 0; margin-left: 12px; }
+    details[open] summary::after { content: '−'; }
+    details[open] summary { color: var(--accent); }
+
+    .faq-body {
+      padding: 13px 18px 15px;
+      font-size: 13.5px;
+      color: var(--text-2);
+      line-height: 1.7;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── CTA ─────────────────────────────────────────────── */
+    .cta-section { padding: 68px 0; border-top: 1px solid var(--border); text-align: center; }
+
+    .cta-box {
+      background: var(--bg-card);
+      border: 1px solid var(--accent-ring);
+      border-radius: 14px;
+      padding: 50px 32px;
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    .cta-h2 {
+      font-size: clamp(20px, 3vw, 28px);
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      margin-bottom: 12px;
+    }
+
+    .cta-p {
+      font-size: 14.5px;
+      color: var(--text-2);
+      margin-bottom: 26px;
+      line-height: 1.65;
+    }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .lp-footer { border-top: 1px solid var(--border); padding: 24px 28px; }
+
+    .footer-inner {
+      max-width: 1060px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-2);
+    }
+
+    .footer-brand svg { color: var(--accent); }
+
+    .footer-note {
+      font-size: 11.5px;
+      color: var(--text-3);
+      max-width: 520px;
+      line-height: 1.6;
+      text-align: right;
+    }
+
+    /* ── Responsive ──────────────────────────────────────── */
+    @media (max-width: 720px) {
+      .lp-nav { display: none; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .footer-note { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SVG sprite (landing-only, inline) -->
+<svg style="display:none" aria-hidden="true">
+  <defs>
+    <symbol id="lp-cg" viewBox="0 0 32 32" fill="none">
+      <path d="M16 2.5L3.5 8v8c0 8.3 5.8 14.8 12.5 16.5C22.7 30.8 28.5 24.3 28.5 16V8L16 2.5z" fill="rgba(139,92,246,0.12)" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+      <rect x="10.5" y="14" width="11" height="9.5" rx="1.75" stroke="currentColor" stroke-width="1.4"/>
+      <path d="M13 14v-3a3 3 0 0 1 6 0v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      <circle cx="16" cy="18.75" r="1.75" fill="currentColor"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ── Header ───────────────────────────────────────────────── -->
+<header class="lp-header">
+  <div class="lp-brand">
+    <svg style="width:22px;height:22px" viewBox="0 0 32 32" aria-hidden="true"><use href="#lp-cg"></use></svg>
+    CyberGuard
+  </div>
+  <nav class="lp-nav">
+    <a href="#features">Features</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+  <a href="/dashboard" class="btn-header">Open Dashboard</a>
+</header>
+
+<!-- ── Hero ─────────────────────────────────────────────────── -->
+<section class="lp-hero">
+  <div class="lp-wrap">
+    <div class="hero-badge">
+      <span class="hero-dot"></span>
+      AI-Powered Security Platform
+    </div>
+    <h1 class="hero-h1">
+      Cybersecurity guidance<br>
+      <em>built for everyone</em>
+    </h1>
+    <p class="hero-sub">
+      Analyse passwords, detect phishing emails, identify scams, and check URLs for threats — backed by an expert AI assistant, available instantly.
+    </p>
+    <div class="hero-btns">
+      <a href="/dashboard" class="btn-primary">Start for Free</a>
+      <a href="#features" class="btn-ghost">See What It Does</a>
+    </div>
+    <div class="hero-trust">
+      <div class="trust-pill"><div class="trust-check">&#10003;</div> No account required</div>
+      <div class="trust-pill"><div class="trust-check">&#10003;</div> No data stored</div>
+      <div class="trust-pill"><div class="trust-check">&#10003;</div> Completely free</div>
+      <div class="trust-pill"><div class="trust-check">&#10003;</div> Open source</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ─────────────────────────────────────────────── -->
+<section id="features" class="lp-section">
+  <div class="lp-wrap">
+    <div class="eyebrow">Security Tools</div>
+    <h2 class="section-h2">Everything you need to stay safe</h2>
+    <p class="section-sub">Professional-grade security analysis — no technical knowledge required.</p>
+    <div class="features-grid">
+
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h3 class="feat-h3">Password Analyzer</h3>
+        <p class="feat-p">Instant strength scoring with detailed feedback on length, complexity, and common vulnerabilities. Includes a cryptographically secure password generator.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        </div>
+        <h3 class="feat-h3">Phishing Detector</h3>
+        <p class="feat-p">Multi-indicator analysis of suspicious emails. Detects urgency tactics, sender spoofing, suspicious links, credential-harvesting patterns, and grammar anomalies.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3 class="feat-h3">Scam Detector</h3>
+        <p class="feat-p">Pattern recognition for gift card scams, advance-fee fraud, romance scams, impersonation, fake investment returns, and 20+ other scam types.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </div>
+        <h3 class="feat-h3">URL Safety Checker</h3>
+        <p class="feat-p">Heuristic analysis of URLs for phishing indicators: suspicious TLDs, brand impersonation, URL shorteners, IP-based domains, and obfuscation techniques.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3 class="feat-h3">AI Security Assistant</h3>
+        <p class="feat-p">Expert guidance on passwords, phishing, malware, VPNs, 2FA, network security, privacy, cloud security, and incident response — powered by a large language model.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <h3 class="feat-h3">Incident Response Guides</h3>
+        <p class="feat-p">Step-by-step guidance after a breach, ransomware attack, account compromise, or device infection — from containment to full recovery.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── How It Works ──────────────────────────────────────────── -->
+<section id="how-it-works" class="lp-section">
+  <div class="lp-wrap">
+    <div class="eyebrow">How It Works</div>
+    <h2 class="section-h2">Simple. Instant. No setup.</h2>
+    <p class="section-sub">No account needed. No data stored. No learning curve.</p>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h3 class="step-h3">Choose a Tool</h3>
+        <p class="step-p">Select a security scanner from the sidebar, or ask the AI assistant a question directly in the chat view.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h3 class="step-h3">Paste Your Content</h3>
+        <p class="step-p">Paste a suspicious email, message, URL, or password. Analysis runs instantly — nothing leaves the session.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h3 class="step-h3">Get Your Report</h3>
+        <p class="step-p">Receive a clear risk score, specific warning indicators, and actionable recommendations in plain language.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Security Principles ────────────────────────────────────── -->
+<section class="lp-section">
+  <div class="lp-wrap">
+    <div class="eyebrow">Built Responsibly</div>
+    <h2 class="section-h2">Security by design</h2>
+    <p class="section-sub">Every component is built with your security and privacy in mind.</p>
+    <div class="principles-grid">
+
+      <div class="principle">
+        <div class="principle-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div>
+          <div class="principle-h4">Input Sanitisation</div>
+          <div class="principle-p">All inputs are sanitised before processing to prevent injection attacks.</div>
+        </div>
+      </div>
+
+      <div class="principle">
+        <div class="principle-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div>
+          <div class="principle-h4">Session Isolation</div>
+          <div class="principle-p">Each session is fully isolated — your data is never shared with other users.</div>
+        </div>
+      </div>
+
+      <div class="principle">
+        <div class="principle-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <div>
+          <div class="principle-h4">Rate Limiting</div>
+          <div class="principle-p">All endpoints are rate-limited to prevent abuse and ensure fair access.</div>
+        </div>
+      </div>
+
+      <div class="principle">
+        <div class="principle-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <div>
+          <div class="principle-h4">No Persistent Storage</div>
+          <div class="principle-p">Analysed content is not stored beyond the current browser session.</div>
+        </div>
+      </div>
+
+      <div class="principle">
+        <div class="principle-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></div>
+        <div>
+          <div class="principle-h4">Secure Cookies</div>
+          <div class="principle-p">Session cookies use HTTPOnly and SameSite flags against cross-site attacks.</div>
+        </div>
+      </div>
+
+      <div class="principle">
+        <div class="principle-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div>
+          <div class="principle-h4">Heuristic-Only Analysis</div>
+          <div class="principle-p">Scanners run locally — your pasted content doesn't reach third-party APIs.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ───────────────────────────────────────────────────── -->
+<section id="faq" class="lp-section">
+  <div class="lp-wrap">
+    <div class="eyebrow">FAQ</div>
+    <h2 class="section-h2">Common questions</h2>
+    <p class="section-sub">Everything you need to know before you start.</p>
+    <div class="faq-list">
+
+      <details>
+        <summary>Is CyberGuard free to use?</summary>
+        <div class="faq-body">Yes, completely free. The password analyzer, phishing detector, scam detector, and URL checker all run with no cost or account. The AI assistant requires a Groq or OpenAI API key to function.</div>
+      </details>
+
+      <details>
+        <summary>Is my data stored or logged?</summary>
+        <div class="faq-body">Content you analyse (emails, messages, URLs, passwords) is processed in memory and not persisted. Only anonymous tool usage counts are logged. Conversation history exists only in your browser session and clears when you close the tab.</div>
+      </details>
+
+      <details>
+        <summary>How accurate are the security scanners?</summary>
+        <div class="faq-body">The scanners use heuristic pattern matching — designed for educational awareness and first-pass triage, not as definitive security verdicts. They detect common red flags but cannot catch every sophisticated attack. Always exercise independent judgment and consult a professional for serious incidents.</div>
+      </details>
+
+      <details>
+        <summary>Can CyberGuard tell me if a URL is definitely safe?</summary>
+        <div class="faq-body">No tool can guarantee a URL is completely safe. The URL checker analyses structural indicators (suspicious TLDs, brand impersonation, URL shorteners, IP domains) but does not access the live URL or query real-time threat databases. Think of it as a pre-click sanity check.</div>
+      </details>
+
+      <details>
+        <summary>Who is CyberGuard designed for?</summary>
+        <div class="faq-body">CyberGuard is built for everyone — from individuals verifying a suspicious email, to security-aware professionals wanting a quick first-pass analysis. It provides beginner-friendly explanations while offering the depth experienced users expect.</div>
+      </details>
+
+      <details>
+        <summary>Is this a replacement for professional cybersecurity services?</summary>
+        <div class="faq-body">No. CyberGuard is an educational guidance tool. For active security incidents, data breaches affecting your organisation, or compliance matters, contact a qualified cybersecurity professional or your organisation's security team.</div>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ───────────────────────────────────────────────────── -->
+<section class="cta-section">
+  <div class="lp-wrap">
+    <div class="cta-box">
+      <h2 class="cta-h2">Start protecting yourself today</h2>
+      <p class="cta-p">No account, no install, no cost. Open the dashboard and run your first analysis in under 30 seconds.</p>
+      <a href="/dashboard" class="btn-primary">Open CyberGuard</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ────────────────────────────────────────────────── -->
+<footer class="lp-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <svg style="width:15px;height:15px" viewBox="0 0 32 32" aria-hidden="true"><use href="#lp-cg"></use></svg>
+      CyberGuard &nbsp;·&nbsp; v1.0.0 &nbsp;·&nbsp; MIT License
+    </div>
+    <div class="footer-note">
+      Educational tool for defensive security awareness. Does not replace professional cybersecurity advice or incident response services.
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
