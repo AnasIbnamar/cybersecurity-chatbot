@@ -156,6 +156,9 @@ Open your browser at:
 - `http://localhost:5000/dashboard` — Main security dashboard
 - `http://localhost:5000/admin` — Analytics dashboard
 
+## Live Demo
+
+https://cybersecurity-chatbot-cd27.onrender.com
 ---
 
 ## API Reference
